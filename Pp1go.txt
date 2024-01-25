@@ -1,0 +1,63 @@
+package main
+
+import (
+	"fmt"
+	"math"
+	"math/rand"
+	"os"
+	"time"
+)
+
+func main() {
+	inicio := time.Now()
+
+	// Obtener los valores de M y N de los argumentos de línea de comandos
+	var M, N int
+	fmt.Sscanf(os.Args[1], "%d", &M)
+	fmt.Sscanf(os.Args[2], "%d", &N)
+
+	// Semilla para la generación de números aleatorios
+	rand.Seed(time.Now().UnixNano())
+
+	// Promedio de los perímetros de los polígonos generados
+	var avgPerimeter float64
+
+	for i := 0; i < M; i++ {
+		// Generar un círculo de radio aleatorio centrado en una posición aleatoria
+		circleX := rand.Float64() * 10
+		circleY := rand.Float64() * 10
+		circleRadius := rand.Float64() * 5
+
+		// Generar un polígono convexo de N lados en la circunferencia del círculo
+		polygon := make([][2]float64, N)
+		for j := 0; j < N; j++ {
+			angle := float64(j) * 2.0 * math.Pi / float64(N)
+			x := circleX + circleRadius*math.Cos(angle)
+			y := circleY + circleRadius*math.Sin(angle)
+			polygon[j] = [2]float64{x, y}
+		}
+
+		// Distorsionar el polígono en base al radio del círculo
+		for j := 0; j < N; j++ {
+			weight := rand.Float64()*0.98 + 0.01 // Rango de [0.01, 0.99]
+			x := (1-weight)*circleX + weight*polygon[j][0]
+			y := (1-weight)*circleY + weight*polygon[j][1]
+			polygon[j] = [2]float64{x, y}
+		}
+
+		// Calcular el perímetro del polígono
+		perimeter := 0.0
+		for j := 0; j < N; j++ {
+			dx := polygon[(j+1)%N][0] - polygon[j][0]
+			dy := polygon[(j+1)%N][1] - polygon[j][1]
+			sideLength := math.Sqrt(dx*dx + dy*dy)
+			perimeter += sideLength
+		}
+
+		avgPerimeter += perimeter / float64(M)
+	}
+	fin := time.Now()
+	tiempo_transcurrido := fin.Sub(inicio)
+	fmt.Println(tiempo_transcurrido.Seconds())
+	fmt.Printf("El promedio de los perímetros de los %d polígonos generados es: %f\n", M, avgPerimeter)
+}
