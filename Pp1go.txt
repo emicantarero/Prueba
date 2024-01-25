@@ -10,7 +10,7 @@ import (
 
 func main() {
 	inicio := time.Now()
-
+	Hola
 	// Obtener los valores de M y N de los argumentos de línea de comandos
 	var M, N int
 	fmt.Sscanf(os.Args[1], "%d", &M)
